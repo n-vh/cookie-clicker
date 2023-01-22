@@ -15,13 +15,12 @@ const nameElement = document.getElementById('name');
 const bonusList = document.getElementById('bonus-list');
 const bonusTemplate = document.getElementById('bonus-template');
 const shurikenElement = document.getElementById('shuriken');
-const resetElement = document.getElementById('reset');
+const resetButton = document.getElementById('reset');
 const notificationsList = document.getElementById('notifications-list');
 const notificationTemplate = document.getElementById('notification-template');
-const newName = document.getElementById('new-name');
+const newNameButton = document.getElementById('new-name');
 const popup = document.getElementById('popup');
-const closePopUpButton = document.getElementById('close-popup-button');
-const changeMode = document.getElementById('mode');
+const closePopupButton = document.getElementById('close-popup-button');
 
 let bank = 0;
 let clickPerSeconds = 0;
@@ -134,7 +133,7 @@ function updateBonusPrice(bonus) {
 function updateBonusCps(bonus) {
   bonus.cps = calculateCps(bonus.index);
   const multiplier = bonus.element.querySelector('.multiplier');
-  multiplier.textContent = roundDecimalNumber(bonus.cps * bonus.count);
+  multiplier.textContent = `${roundDecimalNumber(bonus.cps * bonus.count)}/sec`;
 }
 
 function updateBonusAvailability() {
@@ -250,29 +249,29 @@ function randomShurikenSpawn() {
 
 // EVENT LISTENERS
 
-closePopUpButton.addEventListener('click', () => {
+closePopupButton.addEventListener('click', () => {
   popup.classList.add('hidden');
   localStorage.setItem('popup', 'true');
 });
 
-newName.addEventListener('click', () => {
-  getNewName();
-});
-
-clickerElement.addEventListener('mousedown', () => {
+clickerElement.addEventListener('click', () => {
   clickerElement.src = './karate-2.svg';
 
   const multiplier = hasBoost ? 2 : 1;
   updateBank(1 * multiplier);
   updateScore(1 * multiplier);
   updateBonusAvailability();
+
+  setTimeout(() => {
+    clickerElement.src = './karate-1.svg';
+  }, 100);
 });
 
-clickerElement.addEventListener('mouseup', () => {
-  clickerElement.src = './karate-1.svg';
+newNameButton.addEventListener('click', () => {
+  getNewName();
 });
 
-resetElement.addEventListener('click', () => {
+resetButton.addEventListener('click', () => {
   if (confirm('Click OK to reset your game. All your progress will be deleted.')) {
     updateScore(-score);
     updateBank(-bank);
@@ -293,21 +292,6 @@ resetElement.addEventListener('click', () => {
     setRandomNinjaName();
 
     updateBonusAvailability();
-  }
-});
-
-mode.addEventListener('click', () => {
-  if (
-    localStorage.theme === 'dark' ||
-    (!('theme' in localStorage) &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches)
-  ) {
-    document.documentElement.classList.add('dark');
-    localStorage.theme = 'light';
-  } else {
-    document.documentElement.classList.remove('dark');
-
-    localStorage.theme = 'dark';
   }
 });
 
