@@ -29,6 +29,7 @@ let hasBoost = false;
 let cpsIntervalId;
 let name;
 let id;
+let token;
 
 // RANDOM NAME
 
@@ -295,11 +296,31 @@ resetButton.addEventListener('click', () => {
   }
 });
 
-// DATABASE
+// REQUESTS
+
+async function getToken() {
+  try {
+    const response = await fetch(`${serverUrl}/auth`, {
+      method: 'POST',
+      body: id,
+    });
+    const data = await response.text();
+
+    if (response.ok) {
+      return data;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 async function getDatabase(route) {
   try {
-    const response = await fetch(`${serverUrl}/${route}/${id}`);
+    const response = await fetch(`${serverUrl}/${route}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     const data = await response.json();
 
     if (response.ok) {
@@ -316,6 +337,7 @@ async function postDatabase(route, data) {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });
@@ -346,6 +368,8 @@ setInterval(() => {
 document.addEventListener('DOMContentLoaded', async () => {
   id = localStorage.getItem('id') || uuid();
   localStorage.setItem('id', id);
+
+  token = await getToken();
 
   await getDatabase('game').then((data) => {
     if (data) {
